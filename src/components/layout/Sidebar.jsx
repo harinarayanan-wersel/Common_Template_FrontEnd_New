@@ -5,14 +5,10 @@ import {
   LayoutDashboard,
   Users,
   MessageSquare,
-  DoorOpen,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
   ChevronUp,
-  Package,
-  Calendar,
-  Wrench,
 } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions.js";
 import "./Sidebar.css";
@@ -38,28 +34,6 @@ const NAVIGATION = [
         href: ROUTES.CHAT,
         permission: "ai_chat_access",
       },
-      {
-        title: "Rooms",
-        icon: DoorOpen,
-        href: ROUTES.ROOMS,
-        children: [
-          {
-            title: "Inventory",
-            icon: Package,
-            href: ROUTES.ROOMS_INVENTORY,
-          },
-          {
-            title: "Bookings",
-            icon: Calendar,
-            href: ROUTES.ROOMS_BOOKINGS,
-          },
-          {
-            title: "Maintenance",
-            icon: Wrench,
-            href: ROUTES.ROOMS_MAINTENANCE,
-          },
-        ],
-      },
     ],
   },
 ];
@@ -77,12 +51,12 @@ const NavLink = ({ item, active, onNavigate, collapsed, hasChildren, isExpanded,
       
       if (collapsed) {
         // When collapsed, tooltip appears to the right of icon (flex alignment)
-        tooltip.style.left = `${iconRect.right + 12}px`;
+        tooltip.style.left = `${iconRect.right + 18}px`;
         tooltip.style.top = `${iconRect.top + iconRect.height / 2}px`;
         tooltip.style.transform = 'translateY(-50%)';
       } else {
         // When expanded, tooltip appears to the right of icon
-        tooltip.style.left = `${iconRect.right + 12}px`;
+        tooltip.style.left = `${iconRect.right + 18}px`;
         tooltip.style.top = `${iconRect.top + iconRect.height / 2}px`;
         tooltip.style.transform = 'translateY(-50%)';
       }
@@ -318,24 +292,11 @@ export const Sidebar = ({
     >
       {/* Header */}
       <div className={`sidebar-header ${collapsed ? "collapsed" : ""}`}>
-        <div className="sidebar-logo">
-          <svg
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect x="0.5" y="0.5" width="4.5" height="4.5" rx="0.75" fill="currentColor" />
-            <rect x="5.5" y="0.5" width="4.5" height="4.5" rx="0.75" fill="currentColor" />
-            <rect x="10.5" y="0.5" width="4.5" height="4.5" rx="0.75" fill="currentColor" />
-            <rect x="0.5" y="5.5" width="4.5" height="4.5" rx="0.75" fill="currentColor" />
-            <rect x="5.5" y="5.5" width="4.5" height="4.5" rx="0.75" fill="currentColor" />
-            <rect x="10.5" y="5.5" width="4.5" height="4.5" rx="0.75" fill="currentColor" />
-            <rect x="0.5" y="10.5" width="4.5" height="4.5" rx="0.75" fill="currentColor" />
-            <rect x="5.5" y="10.5" width="4.5" height="4.5" rx="0.75" fill="currentColor" />
-            <rect x="10.5" y="10.5" width="4.5" height="4.5" rx="0.75" fill="currentColor" />
-          </svg>
-        </div>
-        {!collapsed && (
+        {collapsed ? (
+          <div className="sidebar-logo">
+            <span className="logo-text">G</span>
+          </div>
+        ) : (
           <span className="sidebar-title">Gromaxx</span>
         )}
         {onToggleCollapse && (

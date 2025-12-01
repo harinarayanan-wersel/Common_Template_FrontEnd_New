@@ -37,6 +37,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
+import "./Header.css";
 
 export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
   const { theme, setTheme } = useTheme();
@@ -226,7 +227,7 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
             ref={searchRef}
             className={cn(
               "flex items-center gap-2 bg-gray-100 rounded-xl transition-all duration-300",
-              "md:flex md:px-4 md:py-2 md:w-full md:relative",
+              "md:flex md:px-4 md:py-2 md:w-[45%] md:relative",
               isSearchExpanded
                 ? "fixed left-4 right-4 top-4 z-50 px-4 py-2 flex"
                 : "hidden"
