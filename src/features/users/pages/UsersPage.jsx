@@ -21,7 +21,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { ROUTES } from "../../../app/constants.js";
-import { DataTable } from "../../../components/ui/data-table.jsx";
+import { AirtableDataTable } from "../../../components/datatable/AirtableDataTable.jsx";
 
 import { DynamicCardView } from "@/components/ui/dynamic-card-view.jsx";
 import {
@@ -112,59 +112,124 @@ export const UsersPage = () => {
     return users.map((user, index) => formatUserForDisplay(user, index));
   }, [users]);
 
-  // Define columns for DataTable
+  // Define columns for AirtableDataTable
   const columns = [
     {
-      key: "userId",
-      label: "User ID",
-      sortable: true,
-    },
-    {
-      key: "name",
+      id: "user",
       label: "User",
+      accessorKey: "name",
       sortable: true,
-      render: (value, row) => (
+      editable: true,
+      frozen: true,
+      width: 240,
+      minWidth: 200,
+      maxWidth: 300,
+      fieldType: "text",
+      cellRenderer: (value, row) => (
         <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10">
+          <Avatar className="h-8 w-8 flex-shrink-0">
             <AvatarImage src={row.avatar} alt={value} />
-            <AvatarFallback>
+            <AvatarFallback className="text-xs font-medium bg-gray-100 text-gray-600">
               {value
                 ?.split(" ")
                 .map((n) => n[0])
                 .join("")
-                .toUpperCase() || "U"}
+                .toUpperCase()
+                .slice(0, 2) || "U"}
             </AvatarFallback>
           </Avatar>
-          <span className="font-medium text-foreground">{value}</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className="font-semibold text-sm text-gray-900 truncate">
+              {value || "Unknown User"}
+            </span>
+            <span className="text-xs text-gray-500 truncate">{row.userId || "N/A"}</span>
+          </div>
         </div>
       ),
     },
     {
-      key: "email",
+      id: "email",
       label: "Email",
+      accessorKey: "email",
       sortable: true,
+      editable: true,
+      filterable: true,
+      width: 260,
+      minWidth: 200,
+      maxWidth: 350,
+      fieldType: "email",
     },
     {
-      key: "phone",
+      id: "phone",
       label: "Phone",
+      accessorKey: "phone",
       sortable: true,
+      editable: true,
+      filterable: true,
+      width: 160,
+      minWidth: 140,
+      maxWidth: 200,
+      fieldType: "phone",
     },
     {
-      key: "status",
-      label: "Status",
+      id: "role",
+      label: "Role",
+      accessorKey: "role",
       sortable: true,
-      render: (value) => (
+      editable: true,
+      filterable: true,
+      width: 150,
+      minWidth: 120,
+      maxWidth: 200,
+      fieldType: "dropdown",
+      options: [
+        { value: "admin", label: "Admin" },
+        { value: "manager", label: "Manager" },
+        { value: "team member", label: "Team Member" },
+        { value: "viewer", label: "Viewer" },
+      ],
+    },
+    {
+      id: "status",
+      label: "Status",
+      accessorKey: "status",
+      sortable: true,
+      editable: true,
+      filterable: true,
+      width: 140,
+      minWidth: 120,
+      maxWidth: 160,
+      fieldType: "select",
+      options: [
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" },
+        { value: "pending", label: "Pending" },
+      ],
+      cellRenderer: (value) => (
         <span
           className={cn(
-            "rounded-full px-3 py-1 text-xs font-medium",
+            "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium border",
             value === "active"
-              ? "bg-green-500/20 text-green-400 border border-green-500/30"
-              : "bg-muted text-muted-foreground"
+              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+              : value === "inactive"
+                ? "bg-red-50 text-red-700 border-red-200"
+                : "bg-orange-50 text-orange-700 border-orange-200"
           )}
         >
-          {value === "active" ? "Active" : "Inactive"}
+          {value === "active" ? "Active" : value === "inactive" ? "Inactive" : value || "Unknown"}
         </span>
       ),
+    },
+    {
+      id: "lastLogin",
+      label: "Last Login",
+      accessorKey: "joinDate",
+      sortable: true,
+      editable: false,
+      width: 150,
+      minWidth: 130,
+      maxWidth: 180,
+      fieldType: "date",
     },
   ];
 
@@ -308,21 +373,50 @@ export const UsersPage = () => {
                   No users found. Use “Add User” to create the first one.
                 </div>
               ) : (
-                <DataTable
+                <AirtableDataTable
                   data={displayUsers}
                   columns={columns}
-                  searchKey=""
-                  searchPlaceholder="Search member here..."
-                  pageSize={10}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  actionsLabel="Action"
-                  showSearch
-                  showPagination
-                  renderCard={renderUserCard}
+                  onCellEdit={(row, columnId, value) => {
+                    // Handle inline cell editing
+                    console.log("Cell edit:", row, columnId, value);
+                    // You can dispatch an update action here
+                  }}
+                  onRowDelete={handleDelete}
+                  onBulkAction={(action, rows) => {
+                    console.log("Bulk action:", action, rows);
+                    // Handle bulk actions (changeRole, deactivate, etc.)
+                  }}
+                  onExport={(format, rows) => {
+                    // Handle export
+                    if (format === "csv") {
+                      const headers = Object.keys(rows[0] || {});
+                      const csvContent = [
+                        headers.join(","),
+                        ...rows.map((row) =>
+                          headers
+                            .map((header) => {
+                              const value = row[header];
+                              return typeof value === "string" && value.includes(",")
+                                ? `"${value}"`
+                                : value ?? "";
+                            })
+                            .join(",")
+                        ),
+                      ].join("\n");
+
+                      const blob = new Blob([csvContent], { type: "text/csv" });
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = "users-export.csv";
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                    }
+                  }}
+                  storageKey="users-airtable-preferences"
                   toolbarActions={
                     <Button
-                      className="h-[38px] gap-2 rounded-lg bg-[hsl(var(--primary))] px-4 text-[hsl(var(--primary-foreground))] font-medium shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:bg-[hsl(var(--primary)/0.9)]"
+                      className="h-9 gap-2 rounded-lg bg-[hsl(var(--primary))] px-4 text-[hsl(var(--primary-foreground))] font-medium shadow-sm hover:bg-[hsl(var(--primary)/0.9)]"
                       onClick={() => setCreateDialogOpen(true)}
                     >
                       <Plus className="h-4 w-4" />
