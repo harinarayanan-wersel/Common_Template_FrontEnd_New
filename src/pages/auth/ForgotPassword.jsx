@@ -93,7 +93,7 @@ export const ForgotPassword = () => {
       <div className="flex-1 flex items-center justify-center bg-background p-4 lg:p-8 min-h-[calc(100vh-12rem)] lg:min-h-screen">
         <div className="w-full max-w-md py-10 lg:py-0">
           <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            Forgot Password?
+            Trust & Security Focused
           </h1>
           <p className="text-muted-foreground mb-8 text-sm lg:text-base">
             Enter your email address and we'll send you a one-time passcode to

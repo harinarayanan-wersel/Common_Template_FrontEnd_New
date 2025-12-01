@@ -221,7 +221,7 @@ export const SignIn = () => {
       <div className="flex-1 flex items-center justify-center bg-background p-4 lg:p-8 min-h-[calc(100vh-12rem)] lg:min-h-screen relative">
         <div className="w-full max-w-md py-8 lg:py-0">
           <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            Welcome back to Gromaxx!
+            Stay comfortable. Stay in control!
           </h1>
           <p className="text-muted-foreground mb-8 text-sm lg:text-base">
             Sign in with social account or enter your details
@@ -333,7 +333,7 @@ export const SignIn = () => {
                 to={ROUTES.FORGOT_PASSWORD}
                 className="text-sm text-primary hover:underline"
               >
-                Forgot Password?
+                Trust & Security Focused
               </Link>
             </div>
 
