@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Menu,
   PanelLeftOpen,
@@ -27,6 +27,7 @@ import {
   XCircle,
   Mail,
   Calendar,
+  X,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -44,6 +45,8 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
   const [mounted, setMounted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const searchRef = useRef(null);
   const { logout } = useAuth();
 
   const languages = [
@@ -176,6 +179,29 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
     };
   }, []);
 
+  // Handle click outside search bar to collapse on mobile
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        isSearchExpanded &&
+        searchRef.current &&
+        !searchRef.current.contains(event.target)
+      ) {
+        setIsSearchExpanded(false);
+      }
+    };
+
+    if (isSearchExpanded) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [isSearchExpanded]);
+
   return (
     <header
       className={cn(
@@ -210,20 +236,58 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
             )}
           </button> */}
 
+          {/* Search Icon - Mobile collapsed state */}
+          {!isSearchExpanded && (
+            <button
+              type="button"
+              onClick={() => setIsSearchExpanded(true)}
+              className="md:hidden h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+              aria-label="Open search"
+            >
+              <Search className="h-5 w-5 text-muted-foreground" />
+            </button>
+          )}
+
           {/* Search Bar - Trezo Style */}
-          <div className="hidden md:flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-xl w-full">
+          <div
+            ref={searchRef}
+            className={cn(
+              "flex items-center gap-2 bg-gray-100 rounded-xl transition-all duration-300",
+              "md:flex md:px-4 md:py-2 md:w-full md:relative",
+              isSearchExpanded
+                ? "fixed left-4 right-4 top-4 z-50 px-4 py-2 flex"
+                : "hidden"
+            )}
+          >
             <Search className="h-4 w-4 text-primary flex-shrink-0 pointer-events-none" />
             <input
               type="text"
               aria-label="Search"
               placeholder="What are you looking for today?.."
               className="bg-transparent outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
+              autoFocus={isSearchExpanded}
             />
+            {/* Close button - Mobile only */}
+            {isSearchExpanded && (
+              <button
+                type="button"
+                onClick={() => setIsSearchExpanded(false)}
+                className="md:hidden h-8 w-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
+                aria-label="Close search"
+              >
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
+            )}
           </div>
         </div>
 
         {/* RIGHT SECTION */}
-        <div className="flex items-center gap-2 ml-4">
+        <div
+          className={cn(
+            "flex items-center gap-2 ml-4 transition-opacity duration-300",
+            isSearchExpanded ? "md:flex hidden" : "flex"
+          )}
+        >
           {/* Theme Toggle */}
           <button
             type="button"
