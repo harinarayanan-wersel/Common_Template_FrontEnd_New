@@ -1,0 +1,48 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gromaxxGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#357ABD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2563EB;stop-opacity:1" />
+    </linearGradient>
+    <filter id="emboss" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="0.5"/>
+      <feOffset dx="0.5" dy="0.5" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.2"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Abstract G shape - starts bottom left, sweeps up and right, angles down to triangular base, extends up -->
+  <path d="M 6 28 L 6 22 Q 6 10 16 10 Q 24 10 26 18 Q 26 22 22 22 L 18 22" 
+        stroke="url(#gromaxxGradient)" 
+        stroke-width="4" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="none"
+        filter="url(#emboss)"/>
+  <path d="M 6 28 Q 6 32 10 32 L 18 32" 
+        stroke="url(#gromaxxGradient)" 
+        stroke-width="4" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="none"
+        filter="url(#emboss)"/>
+  
+  <!-- x shape - originates from bottom right of G, extends diagonally up-right, ends with circular dot -->
+  <path d="M 18 22 L 32 8" 
+        stroke="url(#gromaxxGradient)" 
+        stroke-width="4" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+        filter="url(#emboss)"/>
+  <circle cx="32" cy="8" r="3" 
+          fill="url(#gromaxxGradient)"
+          filter="url(#emboss)"/>
+</svg>
+

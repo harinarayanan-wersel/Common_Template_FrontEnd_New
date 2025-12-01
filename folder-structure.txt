@@ -1,0 +1,209 @@
+Folder PATH listing for volume Workspace
+Volume serial number is 0A75-DC4E
+D:\HARI\FINAL\REACT-VITE-SAAS-STARTER\SRC
+¦   App.jsx
+¦   main.jsx
+¦   
++---app
+¦       constants.js
+¦       rootReducer.js
+¦       routes.jsx
+¦       store.js
+¦       
++---assets
+¦       favicon.png
+¦       gromaxx-logo.svg
+¦       
++---components
+¦   +---layout
+¦   ¦       Header.jsx
+¦   ¦       MainLayout.jsx
+¦   ¦       MobileMenu.jsx
+¦   ¦       Sidebar.jsx
+¦   ¦       
+¦   +---theme
+¦   ¦       ThemeProvider.jsx
+¦   ¦       
+¦   +---ui
+¦   ¦       accordion.jsx
+¦   ¦       alert-dialog.jsx
+¦   ¦       avatar.jsx
+¦   ¦       badge.jsx
+¦   ¦       button.jsx
+¦   ¦       calendar.jsx
+¦   ¦       card.jsx
+¦   ¦       carousel.jsx
+¦   ¦       checkbox.jsx
+¦   ¦       collapsible.jsx
+¦   ¦       command.jsx
+¦   ¦       data-table.jsx
+¦   ¦       dialog.jsx
+¦   ¦       dropdown-menu.jsx
+¦   ¦       dynamic-card-view.jsx
+¦   ¦       form.jsx
+¦   ¦       hover-card.jsx
+¦   ¦       input.jsx
+¦   ¦       label.jsx
+¦   ¦       menubar.jsx
+¦   ¦       modal.jsx
+¦   ¦       navigation-menu.jsx
+¦   ¦       pagination.jsx
+¦   ¦       popover.jsx
+¦   ¦       progress.jsx
+¦   ¦       radio-group.jsx
+¦   ¦       scroll-area.jsx
+¦   ¦       select.jsx
+¦   ¦       separator.jsx
+¦   ¦       sheet.jsx
+¦   ¦       skeleton.jsx
+¦   ¦       slider.jsx
+¦   ¦       sonner.jsx
+¦   ¦       switch.jsx
+¦   ¦       table.jsx
+¦   ¦       tabs.jsx
+¦   ¦       textarea.jsx
+¦   ¦       toast.jsx
+¦   ¦       toaster.jsx
+¦   ¦       toggle-group.jsx
+¦   ¦       toggle.jsx
+¦   ¦       tooltip.jsx
+¦   ¦       
+¦   +---users
+¦           AddUserDialog.jsx
+¦           
++---config
+¦       apiConfig.js
+¦       env.js
+¦       
++---features
+¦   +---agents
+¦   ¦   +---api
+¦   ¦   ¦       agentsApi.js
+¦   ¦   ¦       
+¦   ¦   +---components
+¦   ¦   ¦       .gitkeep
+¦   ¦   ¦       
+¦   ¦   +---pages
+¦   ¦   ¦       AgentsPage.jsx
+¦   ¦   ¦       
+¦   ¦   +---slices
+¦   ¦           agentsSlice.js
+¦   ¦           
+¦   +---auth
+¦   ¦   +---api
+¦   ¦   ¦       authApi.js
+¦   ¦   ¦       
+¦   ¦   +---components
+¦   ¦   ¦       .gitkeep
+¦   ¦   ¦       ProtectedRoute.jsx
+¦   ¦   ¦       RoleGuard.jsx
+¦   ¦   ¦       
+¦   ¦   +---pages
+¦   ¦   ¦       LoginPage.jsx
+¦   ¦   ¦       RegisterPage.jsx
+¦   ¦   ¦       
+¦   ¦   +---slices
+¦   ¦   ¦       authSlice.js
+¦   ¦   ¦       
+¦   ¦   +---utils
+¦   ¦           .gitkeep
+¦   ¦           
+¦   +---chat
+¦   ¦   +---api
+¦   ¦   ¦       chatApi.js
+¦   ¦   ¦       
+¦   ¦   +---components
+¦   ¦   ¦       .gitkeep
+¦   ¦   ¦       ChatInput.jsx
+¦   ¦   ¦       ChatMessageBubble.jsx
+¦   ¦   ¦       ChatPage.jsx
+¦   ¦   ¦       ChatSidebar.jsx
+¦   ¦   ¦       ChatWindow.jsx
+¦   ¦   ¦       
+¦   ¦   +---pages
+¦   ¦   +---slices
+¦   ¦           chatSlice.js
+¦   ¦           
+¦   +---roles
+¦   ¦   +---components
+¦   ¦   ¦       RolesModule.jsx
+¦   ¦   ¦       
+¦   ¦   +---pages
+¦   ¦   ¦       RolesPage.jsx
+¦   ¦   ¦       
+¦   ¦   +---slices
+¦   ¦           rolesSlice.js
+¦   ¦           
+¦   +---team-units
+¦   ¦   +---api
+¦   ¦   ¦       teamUnitsApi.js
+¦   ¦   ¦       
+¦   ¦   +---components
+¦   ¦   ¦       AddMemberModal.jsx
+¦   ¦   ¦       AddUnitModal.jsx
+¦   ¦   ¦       TeamUnitDrawer.jsx
+¦   ¦   ¦       TeamUnitNode.jsx
+¦   ¦   ¦       TeamUnitsModule.jsx
+¦   ¦   ¦       TeamUnitsTree.jsx
+¦   ¦   ¦       
+¦   ¦   +---hooks
+¦   ¦   ¦       useTeamUnits.js
+¦   ¦   ¦       
+¦   ¦   +---pages
+¦   ¦   ¦       TeamUnitsPage.jsx
+¦   ¦   ¦       
+¦   ¦   +---slices
+¦   ¦   ¦       teamUnitsSlice.js
+¦   ¦   ¦       
+¦   ¦   +---utils
+¦   ¦           unitHierarchy.js
+¦   ¦           
+¦   +---users
+¦       +---api
+¦       ¦       usersApi.js
+¦       ¦       
+¦       +---components
+¦       ¦       .gitkeep
+¦       ¦       
+¦       +---pages
+¦       ¦       UsersPage.jsx
+¦       ¦       
+¦       +---slices
+¦               usersSlice.js
+¦               
++---hooks
+¦       use-toast.js
+¦       useApi.js
+¦       useAuth.js
+¦       useModal.js
+¦       useResponsive.js
+¦       useToast.js
+¦       
++---lib
+¦       utils.js
+¦       
++---pages
+¦   ¦   DashboardPage.jsx
+¦   ¦   RoomsPage.jsx
+¦   ¦   
+¦   +---auth
+¦           ForgotPassword.jsx
+¦           OtpVerification.jsx
+¦           ResetPassword.jsx
+¦           SignIn.jsx
+¦           
++---services
+¦       fetchClient.js
+¦       httpClient.js
+¦       socket.js
+¦       storage.js
+¦       
++---styles
+¦       globals.css
+¦       tailwind.css
+¦       
++---utils
+        format.js
+        helpers.js
+        validators.js
+        
