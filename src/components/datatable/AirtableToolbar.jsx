@@ -51,9 +51,9 @@ export function AirtableToolbar({
     columns,
 }) {
     return (
-        <div className="flex flex-col gap-4 py-4 border-b border-gray-100 bg-white sticky top-0 z-10">
-            <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 flex-1">
+        <div className="flex flex-col gap-4 py-4 border-b border-gray-100 bg-white sticky top-0 z-20">
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4 flex-1">
                     {/* Search */}
                     <div className="relative w-64">
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -61,7 +61,7 @@ export function AirtableToolbar({
                             placeholder="Search..."
                             value={globalFilter ?? ""}
                             onChange={(event) => onGlobalFilterChange(event.target.value)}
-                            className="pl-8 h-9 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                            className="pl-8 h-9 bg-white border-gray-200 shadow-sm focus:bg-white transition-colors placeholder:text-gray-500"
                         />
                     </div>
 
@@ -95,11 +95,11 @@ export function AirtableToolbar({
                     />
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                     {/* Columns Visibility */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-9 gap-2">
+                            <Button variant="outline" size="sm" className="h-9 gap-2 border-gray-200 bg-white hover:bg-gray-50 shadow-sm">
                                 <Columns className="h-4 w-4" />
                                 Columns
                             </Button>
@@ -128,7 +128,7 @@ export function AirtableToolbar({
                     {/* Density */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-9 gap-2">
+                            <Button variant="outline" size="sm" className="h-9 gap-2 border-gray-200 bg-white hover:bg-gray-50 shadow-sm">
                                 <LayoutGrid className="h-4 w-4" />
                                 Density
                             </Button>
@@ -154,7 +154,7 @@ export function AirtableToolbar({
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 gap-2"
+                        className="h-9 gap-2 border-gray-200 bg-white hover:bg-gray-50 shadow-sm"
                         onClick={() => onExport?.("csv", table.getFilteredRowModel().rows.map(r => r.original))}
                     >
                         <Download className="h-4 w-4" />

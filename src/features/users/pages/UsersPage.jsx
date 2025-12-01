@@ -138,11 +138,11 @@ export const UsersPage = () => {
                 .slice(0, 2) || "U"}
             </AvatarFallback>
           </Avatar>
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className="font-semibold text-sm text-gray-900 truncate">
+          <div>
+            <div className="font-medium text-sm text-gray-900 truncate">
               {value || "Unknown User"}
-            </span>
-            <span className="text-xs text-gray-500 truncate">{row.userId || "N/A"}</span>
+            </div>
+            <div className="text-xs text-gray-500 truncate">{row.userId || "N/A"}</div>
           </div>
         </div>
       ),

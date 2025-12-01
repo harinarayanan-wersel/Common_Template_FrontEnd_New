@@ -44,9 +44,9 @@ export function SortPanel({ columns, sorting, onSortingChange, open, onOpenChang
                 <Button
                     variant={sorting.length > 0 ? "secondary" : "outline"}
                     size="sm"
-                    className="h-8 gap-2 border-dashed"
+                    className="h-9 gap-2 border-gray-200 bg-white hover:bg-gray-50 shadow-sm"
                 >
-                    <ArrowUpDown className="h-3.5 w-3.5" />
+                    <ArrowUpDown className="h-4 w-4" />
                     Sort
                     {sorting.length > 0 && (
                         <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-semibold text-primary">
