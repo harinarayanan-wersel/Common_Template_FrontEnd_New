@@ -29,6 +29,7 @@ export const MainLayout = () => {
         collapsed={sidebarCollapsed}
         className="hidden lg:flex"
         onNavigate={() => setMobileOpen(false)}
+        onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
       />
 
       <MobileMenu open={mobileOpen} onOpenChange={setMobileOpen} />
@@ -42,7 +43,7 @@ export const MainLayout = () => {
       <div
         className={cn(
           "flex min-h-screen flex-col pt-[72px]",
-          sidebarCollapsed ? "lg:pl-24" : "lg:pl-[288px]"
+          sidebarCollapsed ? "lg:pl-[72px]" : "lg:pl-[256px]"
         )}
       >
         <main className="flex-1 overflow-y-auto bg-muted/20 px-4 py-6 md:px-8 lg:px-12 dark:bg-transparent">
