@@ -312,7 +312,7 @@ const RoleDialog = ({
                 />
               </div>
 
-              <section className="space-y-3 rounded-xl border border-border/60 bg-muted/30 p-4 dark:border-border/40 dark:bg-muted/10">
+              <section className="space-y-3 rounded-xl border border-border bg-muted/30 p-4">
                 <div>
                   <p className="text-sm font-semibold">Permission Matrix</p>
                   <p className="text-xs text-muted-foreground">
@@ -490,7 +490,7 @@ export const RolesModule = () => {
       className: "min-w-[200px]",
       render: (value, row) => (
         <div className="space-y-1">
-          <p className="font-semibold text-gray-900 dark:text-white">{value}</p>
+          <p className="font-semibold text-foreground">{value}</p>
           {row.code ? (
             <Badge
               variant="secondary"
@@ -508,7 +508,7 @@ export const RolesModule = () => {
       sortable: true,
       className: "min-w-[220px]",
       render: (value) => (
-        <span className="text-gray-600 dark:text-gray-300">{value}</span>
+        <span className="text-muted-foreground">{value}</span>
       ),
     },
     {
@@ -592,7 +592,7 @@ export const RolesModule = () => {
             {Array.from({ length: 5 }).map((_, index) => (
               <div
                 key={index}
-                className="h-12 w-full animate-pulse rounded-xl bg-muted/50 dark:bg-muted/20"
+                className="h-12 w-full animate-pulse rounded-xl bg-muted/50"
               />
             ))}
           </div>

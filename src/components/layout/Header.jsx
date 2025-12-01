@@ -216,7 +216,7 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
             <button
               type="button"
               onClick={() => setIsSearchExpanded(true)}
-              className="md:hidden h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+              className="md:hidden h-10 w-10 flex items-center justify-center rounded-full hover:bg-muted transition"
               aria-label="Open search"
             >
               <Search className="h-5 w-5 text-muted-foreground" />
@@ -226,7 +226,7 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
           <div
             ref={searchRef}
             className={cn(
-              "flex items-center gap-2 bg-gray-100 rounded-xl transition-all duration-300",
+              "flex items-center gap-2 bg-muted border border-border rounded-xl transition-all duration-300",
               "md:flex md:px-4 md:py-2 md:w-[45%] md:relative",
               isSearchExpanded
                 ? "fixed left-4 right-4 top-4 z-50 px-4 py-2 flex"
@@ -246,7 +246,7 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
               <button
                 type="button"
                 onClick={() => setIsSearchExpanded(false)}
-                className="md:hidden h-8 w-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
+                className="md:hidden h-8 w-8 flex items-center justify-center rounded-full hover:bg-muted/80 transition"
                 aria-label="Close search"
               >
                 <X className="h-4 w-4 text-muted-foreground" />

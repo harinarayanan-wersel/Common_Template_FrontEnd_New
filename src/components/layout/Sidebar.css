@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
-  border-right: 1px solid hsl(220, 13%, 70%);
+  border-right: 1px solid hsl(var(--border));
   border-top: none;
   border-bottom: none;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, border-color 0.3s ease;
@@ -33,7 +33,7 @@
   padding: 16px;
   height: 72px;
   min-height: 72px;
-  border-bottom: 1px solid hsl(220, 13%, 70%);
+  border-bottom: 1px solid hsl(var(--border));
   background-color: #ffffff;
   flex-shrink: 0;
   position: relative;
@@ -174,7 +174,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 1px solid #e5e7eb;
+  border: 1px solid hsl(var(--border));
   background: transparent;
   display: flex;
   align-items: center;
@@ -435,7 +435,7 @@
 .sidebar-sublinks.collapsed {
   position: fixed;
   background-color: #ffffff;
-  border: 1px solid rgba(229, 231, 235, 0.8);
+  border: 1px solid hsl(var(--border));
   border-radius: 12px;
   box-shadow: 
     0 10px 15px -3px rgba(0, 0, 0, 0.1),
@@ -579,8 +579,8 @@
 .sidebar-tooltip {
   position: fixed;
   padding: 8px 12px;
-  background-color: #1f2937;
-  color: #ffffff;
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
@@ -593,7 +593,7 @@
     transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 9999;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  border: 1px solid #374151;
+  border: 1px solid hsl(var(--border));
 }
 
 /* Tooltip arrow - always points to the left (icon side) */
@@ -607,7 +607,7 @@
   height: 0;
   border-style: solid;
   border-width: 5px 5px 5px 0;
-  border-color: transparent #1f2937 transparent transparent;
+  border-color: transparent hsl(var(--card)) transparent transparent;
 }
 
 .sidebar-tooltip::after {
@@ -620,7 +620,7 @@
   height: 0;
   border-style: solid;
   border-width: 6px 6px 6px 0;
-  border-color: transparent #374151 transparent transparent;
+  border-color: transparent hsl(var(--border)) transparent transparent;
   z-index: -1;
 }
 
@@ -638,13 +638,13 @@
    ============================================ */
 
 .dark .enterprise-sidebar {
-  background-color: #0f172a;
-  border-right: 1px solid hsl(215, 27.9%, 10%);
+  background-color: hsl(var(--background));
+  border-right: 1px solid hsl(var(--border));
 }
 
 .dark .sidebar-header {
-  background-color: #0f172a;
-  border-bottom: 1px solid hsl(215, 27.9%, 10%);
+  background-color: hsl(var(--background));
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 .dark .sidebar-logo {
@@ -673,7 +673,7 @@
 }
 
 .dark .sidebar-header.collapsed .sidebar-toggle-btn {
-  background-color: #0f172a;
+  background-color: hsl(var(--background));
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -683,7 +683,7 @@
 
 .dark .sidebar-close-btn {
   color: #94a3b8;
-  border-color: rgba(51, 65, 85, 0.5);
+  border-color: hsl(var(--border));
 }
 
 .dark .sidebar-close-btn:hover {
@@ -744,8 +744,8 @@
 
 /* Sub Links - Dark Mode */
 .dark .sidebar-sublinks.collapsed {
-  background-color: #1e293b;
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
   box-shadow: 
     0 10px 15px -3px rgba(0, 0, 0, 0.4),
     0 4px 6px -2px rgba(0, 0, 0, 0.3),
@@ -791,18 +791,18 @@
 
 /* Tooltip - Dark Mode */
 .dark .sidebar-tooltip {
-  background-color: #1e293b;
-  color: #e2e8f0;
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border: 1px solid hsl(var(--border));
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
 }
 
 .dark .sidebar-tooltip::before {
-  border-color: transparent #1e293b transparent transparent;
+  border-color: transparent hsl(var(--card)) transparent transparent;
 }
 
 .dark .sidebar-tooltip::after {
-  border-color: transparent rgba(51, 65, 85, 0.6) transparent transparent;
+  border-color: transparent hsl(var(--border)) transparent transparent;
 }
 
 /* Scrollbar - Dark Mode */

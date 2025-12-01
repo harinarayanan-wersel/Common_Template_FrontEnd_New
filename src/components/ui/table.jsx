@@ -15,7 +15,7 @@ Table.displayName = "Table"
 const TableHeader = React.forwardRef(({ className, ...props }, ref) => (
   <thead
     ref={ref}
-    className={cn("[&_tr]:border-b [&_tr]:bg-card [&_tr]:text-card-foreground dark:[&_tr]:border-[#1f2a44] dark:[&_tr]:bg-[#111a2d]", className)}
+    className={cn("[&_tr]:border-b [&_tr]:bg-card [&_tr]:text-card-foreground", className)}
     {...props} />
 ))
 TableHeader.displayName = "TableHeader"
@@ -40,7 +40,7 @@ const TableRow = React.forwardRef(({ className, ...props }, ref) => (
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted dark:border-[#1d2848] dark:hover:bg-[#16213b] dark:data-[state=selected]:bg-[#16213b]/80",
+      "border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
       className
     )}
     {...props} />
@@ -51,7 +51,7 @@ const TableHead = React.forwardRef(({ className, ...props }, ref) => (
   <th
     ref={ref}
     className={cn(
-      "h-10 p-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] dark:text-gray-200",
+      "h-10 p-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
       className
     )}
     {...props} />
@@ -62,7 +62,7 @@ const TableCell = React.forwardRef(({ className, ...props }, ref) => (
   <td
     ref={ref}
     className={cn(
-      "p-4 align-middle text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] dark:text-gray-300",
+      "p-4 align-middle text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
       className
     )}
     {...props} />
@@ -72,7 +72,7 @@ TableCell.displayName = "TableCell"
 const TableCaption = React.forwardRef(({ className, ...props }, ref) => (
   <caption
     ref={ref}
-    className={cn("mt-4 text-sm text-muted-foreground dark:text-gray-500", className)}
+    className={cn("mt-4 text-sm text-muted-foreground", className)}
     {...props} />
 ))
 TableCaption.displayName = "TableCaption"

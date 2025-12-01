@@ -26,7 +26,7 @@ export const MobileMenu = ({ open, onOpenChange }) => {
           showCloseButton
           onClose={() => onOpenChange(false)}
           onNavigate={() => onOpenChange(false)}
-          className="h-full rounded-r-2xl bg-white dark:bg-[#0c1427]"
+          className="h-full rounded-r-2xl bg-background"
           variant="mobile"
         />
       </div>
