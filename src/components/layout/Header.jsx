@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   Menu,
-  PanelLeftOpen,
-  PanelLeftClose,
   Search,
   SunMedium,
   Moon,
@@ -44,13 +42,13 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().then(() => {
           setIsFullscreen(true);
-        }).catch(() => {});
+        }).catch(() => { });
       } else {
         document.exitFullscreen().then(() => {
           setIsFullscreen(false);
-        }).catch(() => {});
+        }).catch(() => { });
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const handleLogout = () => {
@@ -86,7 +84,7 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-40 h-[72px] border-b border-border bg-background transition-[left] duration-300",
-        sidebarCollapsed ? "lg:left-24" : "lg:left-[288px]"
+        sidebarCollapsed ? "lg:left-[72px]" : "lg:left-[256px]"
       )}
     >
       <div className="flex h-full w-full items-center justify-between px-6">
@@ -100,20 +98,6 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
             className="h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition cursor-pointer lg:hidden"
           >
             <Menu className="h-5 w-5 text-muted-foreground" />
-          </button>
-
-          {/* Sidebar Toggle - Desktop */}
-          <button
-            type="button"
-            onClick={onSidebarToggle}
-            aria-label="Toggle sidebar"
-            className="hidden lg:flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100 transition cursor-pointer"
-          >
-            {sidebarCollapsed ? (
-              <PanelLeftOpen className="h-5 w-5 text-muted-foreground" />
-            ) : (
-              <PanelLeftClose className="h-5 w-5 text-muted-foreground" />
-            )}
           </button>
 
           {/* Search Bar - Trezo Style */}
