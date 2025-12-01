@@ -210,32 +210,6 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
       <div className="flex h-full w-full items-center justify-between px-6">
         {/* LEFT SECTION */}
         <div className="flex items-center gap-3 flex-1">
-          {/* Hamburger Menu - Mobile */}
-          {/* <button
-            type="button"
-            onClick={onMenuClick}
-            aria-label="Open navigation menu"
-            className="group h-10 w-10 flex items-center justify-center rounded-full transition cursor-pointer lg:hidden"
-          >
-            <Menu className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-hover:scale-110" />
-          </button>
-
-<<<<<<< HEAD
-=======
-      
-          <button
-            type="button"
-            onClick={onSidebarToggle}
-            aria-label="Toggle sidebar"
-            className="group hidden lg:flex h-10 w-10 items-center justify-center rounded-full transition cursor-pointer"
-          >
-            {sidebarCollapsed ? (
-              <PanelLeftOpen className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-hover:scale-110" />
-            ) : (
-              <PanelLeftClose className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-hover:scale-110" />
-            )}
-          </button> */}
-
           {/* Search Icon - Mobile collapsed state */}
           {!isSearchExpanded && (
             <button
@@ -247,8 +221,6 @@ export const Header = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
               <Search className="h-5 w-5 text-muted-foreground" />
             </button>
           )}
-
->>>>>>> 7a280fc83cdf58e2f4fb7b09de1ce60d0e2160f4
           {/* Search Bar - Trezo Style */}
           <div
             ref={searchRef}
