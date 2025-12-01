@@ -315,7 +315,7 @@ export const UsersPage = () => {
       {/* Header */}
 
 
-      <Card className="shadow-[0_1px_4px_rgba(0,0,0,0.05)] rounded-xl border border-border bg-white">
+      <Card className="shadow-[0_1px_4px_rgba(0,0,0,0.05)] rounded-xl border border-border bg-card">
         <CardContent className="p-4 sm:p-6">
           <Tabs defaultValue="users" className="space-y-5">
             <TabsList>

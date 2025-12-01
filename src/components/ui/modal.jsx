@@ -15,7 +15,7 @@ const Modal = ({ isOpen, onClose, children, className, ...props }) => {
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" />
       <div
         className={cn(
-          "relative z-50 w-full max-w-lg rounded-t-3xl bg-background/95 p-6 shadow-2xl sm:rounded-2xl dark:border dark:border-[#24304a] dark:bg-[#111a2d]",
+          "relative z-50 w-full max-w-lg rounded-t-3xl bg-background/95 p-6 shadow-2xl sm:rounded-2xl border border-border",
           className
         )}
         onClick={(e) => e.stopPropagation()}
@@ -23,7 +23,7 @@ const Modal = ({ isOpen, onClose, children, className, ...props }) => {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-4 top-4 rounded-full hover:bg-accent/40 dark:text-gray-300 dark:hover:bg-[#1a2642]"
+          className="absolute right-4 top-4 rounded-full hover:bg-accent/40"
           onClick={onClose}
         >
           <X className="h-4 w-4" />

@@ -208,8 +208,8 @@ export const LoginPage = () => {
 
           {/* General Error Message */}
           {errors.general && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400">{errors.general}</p>
+            <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-sm text-destructive">{errors.general}</p>
             </div>
           )}
 
@@ -251,13 +251,13 @@ export const LoginPage = () => {
                 disabled={isLoading}
                 className={`bg-white border-gray-200 text-gray-900 placeholder:text-gray-500 h-11 ${
                   errors.email
-                    ? "border-red-500 dark:border-red-500 placeholder:text-red-400 dark:placeholder:text-red-400"
+                    ? "border-destructive placeholder:text-destructive/70"
                     : ""
                 }`}
                 required
               />
               {errors.email && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.email}</p>
+                <p className="text-sm text-destructive">{errors.email}</p>
               )}
             </div>
 
@@ -276,7 +276,7 @@ export const LoginPage = () => {
                   disabled={isLoading}
                   className={`bg-white border-gray-200 text-gray-900 placeholder:text-gray-500 pr-10 h-11 ${
                     errors.password
-                      ? "border-red-500 dark:border-red-500 placeholder:text-red-400 dark:placeholder:text-red-400"
+                      ? "border-destructive placeholder:text-destructive/70"
                       : ""
                   }`}
                   required
@@ -296,14 +296,14 @@ export const LoginPage = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.password}</p>
+                <p className="text-sm text-destructive">{errors.password}</p>
               )}
             </div>
 
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#605dff] hover:bg-[#504dff] dark:bg-[#605dff] dark:hover:bg-[#504dff] text-white h-12 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#605dff] hover:bg-[#504dff] text-white h-12 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>

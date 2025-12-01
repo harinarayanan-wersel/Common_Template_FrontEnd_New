@@ -2,11 +2,6 @@
 
 /* Header Right Border - Matching Sidebar */
 header {
-  border-right: 1px solid hsl(220, 13%, 70%);
-}
-
-/* Dark Mode Header Border */
-.dark header {
-  border-right: 1px solid hsl(215, 27.9%, 10%);
+  border-right: 1px solid hsl(var(--border));
 }
 

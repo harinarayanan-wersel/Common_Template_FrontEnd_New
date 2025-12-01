@@ -44,7 +44,7 @@ export const DynamicCardView = ({
   const renderAvatarOrIcon = () => {
     if (!avatar && Icon) {
       return (
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
           <Icon className="h-5 w-5" />
         </div>
       );
@@ -52,7 +52,7 @@ export const DynamicCardView = ({
 
     if (!avatar) {
       return (
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-300">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
           <User2 className="h-5 w-5" />
         </div>
       );
@@ -69,7 +69,7 @@ export const DynamicCardView = ({
   return (
     <div
       className={cn(
-        "group rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-[#1d2848] dark:bg-[#111a2d] dark:hover:bg-[#16213b]",
+        "group rounded-lg border border-border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:bg-accent/50",
         compact && "p-3",
         className
       )}
@@ -101,10 +101,10 @@ export const DynamicCardView = ({
 
               const actionClass =
                 action === "delete"
-                  ? "text-destructive hover:text-destructive/90 dark:text-red-400 dark:hover:bg-red-900/30"
+                  ? "text-destructive hover:text-destructive/90 hover:bg-destructive/10"
                   : action === "archive"
-                  ? "text-amber-500 hover:text-amber-400 dark:text-amber-300"
-                  : "text-muted-foreground hover:text-foreground dark:text-gray-300 dark:hover:text-white";
+                  ? "text-amber-500 hover:text-amber-400"
+                  : "text-muted-foreground hover:text-foreground";
 
               return (
                 <Button
