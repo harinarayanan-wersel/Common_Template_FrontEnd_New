@@ -1,112 +1,147 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Phone, Calendar, Mail, Shield } from "lucide-react";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Pencil, Trash2, Mail, Phone, Calendar } from "lucide-react";
+import { motion } from "framer-motion";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export function AirtableCardView({ rows, columns, onEdit, onDelete }) {
-    return (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {rows.map((row) => {
-                const data = row.original;
-                // Try to find common fields based on column accessors or IDs
-                // This is a heuristic mapping since the table is generic
-                const nameCol = columns.find(c => c.id === 'user' || c.id === 'name' || c.accessorKey === 'name');
-                const emailCol = columns.find(c => c.id === 'email' || c.accessorKey === 'email');
-                const roleCol = columns.find(c => c.id === 'role' || c.accessorKey === 'role');
-                const statusCol = columns.find(c => c.id === 'status' || c.accessorKey === 'status');
-                const phoneCol = columns.find(c => c.id === 'phone' || c.accessorKey === 'phone');
-                const dateCol = columns.find(c => c.id === 'lastLogin' || c.accessorKey === 'joinDate' || c.fieldType === 'date');
+  return (
+    <div className="space-y-3">
+      {rows.map((row) => {
+        const data = row.original;
+        const nameCol = columns.find((c) => c.id === "name" || c.accessorKey === "name");
+        const emailCol = columns.find((c) => c.id === "email" || c.accessorKey === "email");
+        const phoneCol = columns.find((c) => c.id === "phone" || c.accessorKey === "phone");
+        const statusCol = columns.find((c) => c.id === "status" || c.accessorKey === "status");
+        const roleCol = columns.find((c) => c.id === "role" || c.accessorKey === "role");
+        const dateCol = columns.find((c) => c.fieldType === "date");
 
-                const name = nameCol ? data[nameCol.accessorKey] : data.name;
-                const email = emailCol ? data[emailCol.accessorKey] : data.email;
-                const role = roleCol ? data[roleCol.accessorKey] : data.role;
-                const status = statusCol ? data[statusCol.accessorKey] : data.status;
-                const phone = phoneCol ? data[phoneCol.accessorKey] : data.phone;
-                const date = dateCol ? data[dateCol.accessorKey] : data.joinDate;
-                const avatar = data.avatar;
+        const name = data[nameCol?.accessorKey || nameCol?.id] || data.name;
+        const email = data[emailCol?.accessorKey || emailCol?.id] || data.email;
+        const phone = data[phoneCol?.accessorKey || phoneCol?.id] || data.phone;
+        const status = data[statusCol?.accessorKey || statusCol?.id] || data.status;
+        const role = data[roleCol?.accessorKey || roleCol?.id] || data.role;
+        const date = data[dateCol?.accessorKey || dateCol?.id] || data.lastLogin;
+        const avatar = data.avatar || data.profile_url;
 
-                return (
-                    <Card key={row.id} className="overflow-hidden">
-                        <CardContent className="p-4">
-                            <div className="flex items-start justify-between">
-                                <div className="flex items-center gap-3">
-                                    <Avatar className="h-10 w-10 border">
-                                        <AvatarImage src={avatar} alt={name} />
-                                        <AvatarFallback>{name?.substring(0, 2).toUpperCase()}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <h3 className="font-semibold text-sm">{name}</h3>
-                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                            <Mail className="h-3 w-3" />
-                                            <span className="truncate max-w-[150px]">{email}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                                            <MoreHorizontal className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onClick={() => onEdit?.(data)}>Edit</DropdownMenuItem>
-                                        <DropdownMenuItem className="text-destructive" onClick={() => onDelete?.(data)}>
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
+        const initials = name
+          ?.split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2) || "?";
 
-                            <div className="mt-4 space-y-2">
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground flex items-center gap-2">
-                                        <Shield className="h-3.5 w-3.5" /> Role
-                                    </span>
-                                    <span className="font-medium capitalize">{role}</span>
-                                </div>
+        return (
+          <motion.div
+            key={row.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Card className="rounded-xl border border-gray-200 bg-white p-4 sm:p-4 shadow-sm">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  {avatar && (
+                    <Avatar className="h-12 w-12 flex-shrink-0">
+                      <AvatarImage src={avatar} alt={name} />
+                      <AvatarFallback className="bg-gray-100 text-gray-600 text-sm font-medium">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-base text-gray-900 truncate">
+                      {name || "Unknown User"}
+                    </div>
+                    {email && (
+                      <div className="text-sm text-gray-500 truncate flex items-center gap-1">
+                        <Mail className="h-3 w-3" />
+                        {email}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {status && (
+                  <Badge
+                    className={cn(
+                      "rounded-md px-2.5 py-1 text-xs font-medium border-0",
+                      String(status).toLowerCase() === "in progress" || String(status).toLowerCase() === "in-progress" || String(status).toLowerCase() === "inprogress"
+                        ? "bg-blue-100 text-blue-700"
+                        : String(status).toLowerCase() === "open"
+                        ? "bg-blue-50 text-blue-500"
+                        : String(status).toLowerCase() === "resolved" || String(status).toLowerCase() === "closed" || String(status).toLowerCase() === "done" || String(status).toLowerCase() === "completed"
+                        ? "bg-teal-100 text-teal-700"
+                        : String(status).toLowerCase() === "active"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : String(status).toLowerCase() === "inactive" || String(status).toLowerCase() === "pending"
+                        ? "bg-amber-100 text-amber-700"
+                        : String(status).toLowerCase() === "cancelled" || String(status).toLowerCase() === "cancelled" || String(status).toLowerCase() === "rejected"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-gray-100 text-gray-700"
+                    )}
+                  >
+                    {status}
+                  </Badge>
+                )}
+              </div>
 
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground flex items-center gap-2">
-                                        <Phone className="h-3.5 w-3.5" /> Phone
-                                    </span>
-                                    <span>{phone || "N/A"}</span>
-                                </div>
+              {/* Body */}
+              <div className="space-y-2 text-sm mb-3">
+                {phone && (
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <Phone className="h-4 w-4 text-gray-400" />
+                    <span>{phone}</span>
+                  </div>
+                )}
+                {role && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-500">Role:</span>
+                    <Badge variant="outline">{role}</Badge>
+                  </div>
+                )}
+                {date && (
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <span>Last login: {format(new Date(date), "MMM d, yyyy")}</span>
+                  </div>
+                )}
+              </div>
 
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground flex items-center gap-2">
-                                        <Calendar className="h-3.5 w-3.5" /> Last Login
-                                    </span>
-                                    <span>
-                                        {date ? (
-                                            typeof date === 'string' && !isNaN(Date.parse(date)) ?
-                                                format(new Date(date), "MMM d, yyyy") : date
-                                        ) : "N/A"}
-                                    </span>
-                                </div>
-
-                                <div className="pt-2 flex items-center justify-between">
-                                    <Badge variant="outline" className={
-                                        status === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
-                                            status === 'inactive' ? 'bg-red-50 text-red-700 border-red-200' :
-                                                'bg-gray-100 text-gray-700'
-                                    }>
-                                        {status || "Unknown"}
-                                    </Badge>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                );
-            })}
-        </div>
-    );
+              {/* Footer Actions */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t">
+                {onEdit && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(data)}
+                    className="h-8"
+                  >
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                )}
+                {onDelete && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDelete(data)}
+                    className="h-8 text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
 }
+

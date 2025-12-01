@@ -19,24 +19,70 @@ import { cn } from "@/lib/utils";
 import { AirtableToolbar } from "./AirtableToolbar";
 import { AirtableCell } from "./AirtableCell";
 import { AirtableCardView } from "./AirtableCardView";
+import { AirtablePagination } from "./AirtablePagination";
 import { BulkActionBar } from "./BulkActionBar";
 import { useDebounce } from "./hooks/useDebounce";
+import { MoreVertical, ArrowUpDown, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const columnHelper = createColumnHelper();
 
+// Helper function to determine minimum column width based on column type
+const getMinColumnWidth = (column) => {
+    const id = column.id?.toLowerCase() || "";
+    const accessorKey = column.accessorKey?.toLowerCase() || "";
+    const label = column.label?.toLowerCase() || "";
+
+    // ID columns
+    if (id.includes("id") || accessorKey.includes("id") || label.includes("id")) {
+        return 120;
+    }
+    // Name columns
+    if (id.includes("name") || accessorKey.includes("name") || label.includes("name") ||
+        id === "user" || accessorKey === "user") {
+        return 200;
+    }
+    // Email columns
+    if (id.includes("email") || accessorKey.includes("email") || label.includes("email")) {
+        return 260;
+    }
+    // Status columns
+    if (id.includes("status") || accessorKey.includes("status") || label.includes("status")) {
+        return 150;
+    }
+    // Action columns
+    if (id === "actions" || accessorKey === "actions") {
+        return 120;
+    }
+    // Default
+    return column.minWidth || 100;
+};
+
 // Memoized row component to prevent unnecessary re-renders
 const TableRow = React.memo(
-    ({ row, rowIndex, density, frozenColumns, getFrozenOffset }) => {
-        const isEven = rowIndex % 2 === 0;
+    ({ row, rowIndex, density, frozenColumns, getFrozenOffset, editingCell, columnOrder }) => {
+        // Density-based row height and padding
+        const rowHeightClass =
+            density === "compact" ? "h-8" :
+                density === "comfortable" ? "h-14" :
+                    "h-12"; // standard
+
+        const cellPaddingClass =
+            density === "compact" ? "px-3 py-1.5" :
+                density === "comfortable" ? "px-4 py-4" :
+                    "px-4 py-3"; // standard
 
         return (
             <tr
                 className={cn(
-                    "border-b border-gray-100 hover:bg-gray-50 transition-colors odd:bg-white even:bg-gray-50",
-                    row.getIsSelected() && "bg-blue-50",
-                    density === "compact" && "h-10",
-                    density === "standard" && "h-12",
-                    density === "comfortable" && "h-14"
+                    "border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150",
+                    rowHeightClass,
+                    row.getIsSelected() && "bg-blue-50"
                 )}
             >
                 {row.getVisibleCells().map((cell, cellIndex) => {
@@ -49,7 +95,8 @@ const TableRow = React.memo(
                         <td
                             key={cell.id}
                             className={cn(
-                                "px-3 py-2 text-sm border-r border-gray-100 last:border-r-0",
+                                "text-sm border-r border-gray-200 last:border-r-0",
+                                cellPaddingClass,
                                 isFrozen && "sticky z-10 bg-inherit"
                             )}
                             style={{
@@ -65,12 +112,28 @@ const TableRow = React.memo(
         );
     },
     (prevProps, nextProps) => {
+        // Check if editing state changed for this row
+        const prevEC = prevProps.editingCell;
+        const nextEC = nextProps.editingCell;
+        const rowId = prevProps.row.id;
+
+        if (prevEC !== nextEC) {
+            const wasEditingThisRow = prevEC?.rowId === rowId;
+            const isEditingThisRow = nextEC?.rowId === rowId;
+
+            // If this row was being edited or is now being edited, we must re-render
+            if (wasEditingThisRow || isEditingThisRow) {
+                return false;
+            }
+        }
+
         // Custom comparison function for React.memo
         return (
             prevProps.row.id === nextProps.row.id &&
             prevProps.rowIndex === nextProps.rowIndex &&
             prevProps.density === nextProps.density &&
             prevProps.row.getIsSelected() === nextProps.row.getIsSelected() &&
+            prevProps.columnOrder === nextProps.columnOrder &&
             JSON.stringify(prevProps.frozenColumns) ===
             JSON.stringify(nextProps.frozenColumns)
         );
@@ -170,6 +233,10 @@ export function AirtableDataTable({
     const [showFilterPanel, setShowFilterPanel] = useState(false);
     const [showSortPanel, setShowSortPanel] = useState(false);
     const [showGroupPanel, setShowGroupPanel] = useState(false);
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 10,
+    });
 
     // Memoize columns to prevent re-creation loops
     // This ensures columns reference is stable unless the actual columns prop changes
@@ -190,6 +257,10 @@ export function AirtableDataTable({
                     setColumnOrder(parsed.columnOrder || []);
                     setFrozenColumns(parsed.frozenColumns || []);
                     setDensity(parsed.density || "standard");
+                    setSorting(parsed.sorting || []);
+                    setFilters(parsed.filters || []);
+                    setGrouping(parsed.grouping || []);
+                    setPagination(parsed.pagination || { pageIndex: 0, pageSize: 10 });
                 }
             } catch (e) {
                 console.error("Failed to load table preferences:", e);
@@ -212,6 +283,10 @@ export function AirtableDataTable({
                         columnOrder,
                         frozenColumns,
                         density,
+                        sorting,
+                        filters,
+                        grouping,
+                        pagination,
                     };
                     localStorage.setItem(storageKey, JSON.stringify(toSave));
                 } catch (e) {
@@ -230,6 +305,10 @@ export function AirtableDataTable({
         columnOrder,
         frozenColumns,
         density,
+        sorting,
+        filters,
+        grouping,
+        pagination,
         storageKey,
     ]);
 
@@ -252,7 +331,7 @@ export function AirtableDataTable({
             columnHelper.display({
                 id: "select",
                 header: ({ table }) => (
-                    <div className="flex items-center justify-center h-full">
+                    <div className="w-12 flex items-center justify-center">
                         <Checkbox
                             checked={table.getIsAllRowsSelected()}
                             onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
@@ -262,7 +341,7 @@ export function AirtableDataTable({
                 ),
                 cell: ({ row }) => (
                     <div
-                        className="flex items-center justify-left h-full"
+                        className="w-12 flex items-center justify-center"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <Checkbox
@@ -307,24 +386,18 @@ export function AirtableDataTable({
                             editingCell?.rowId === info.row.id &&
                             editingCell?.columnId === col.id;
 
-                        // Use custom cell renderer if provided
-                        if (col.cellRenderer) {
-                            return (
-                                <div onClick={(e) => e.stopPropagation()}>
-                                    {col.cellRenderer(value, row)}
-                                </div>
-                            );
-                        }
-
                         return (
                             <AirtableCell
                                 value={value}
                                 row={row}
                                 column={col}
                                 isEditing={isEditing}
-                                onStartEdit={() =>
-                                    setEditingCell({ rowId: info.row.id, columnId: col.id })
-                                }
+                                renderDisplay={col.cellRenderer}
+                                onStartEdit={() => {
+                                    if (col.editable) {
+                                        setEditingCell({ rowId: info.row.id, columnId: col.id });
+                                    }
+                                }}
                                 onSave={(newValue) => {
                                     if (onCellEdit) {
                                         onCellEdit(row, col.id, newValue);
@@ -338,11 +411,40 @@ export function AirtableDataTable({
                     enableSorting: col.sortable !== false,
                     enableResizing: col.resizable !== false,
                     size: columnSizing[col.id] || col.width || 150,
-                    minSize: col.minWidth || 100,
+                    minSize: getMinColumnWidth(col),
                     maxSize: col.maxWidth || 500,
                 })
             );
         });
+
+        // Actions column
+        cols.push(
+            columnHelper.display({
+                id: "actions",
+                header: "Action",
+                cell: ({ row }) => (
+                    <div className="flex justify-center">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="h-8 w-8 p-0 hover:bg-gray-100 rounded-full flex items-center justify-center">
+                                    <MoreVertical className="h-4 w-4 text-gray-500" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => onRowDelete?.(row.original)}>
+                                    Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                ),
+                size: 50,
+                minSize: 50,
+                maxSize: 50,
+                enableResizing: false,
+                enableSorting: false,
+            })
+        );
 
         return cols;
     }, [
@@ -396,15 +498,6 @@ export function AirtableDataTable({
     }, [filteredData, sorting, stableColumns]);
 
     // Memoize table config to prevent recreation on every render
-    // CRITICAL FIX: Memoizing the config object prevents TanStack from re-initializing
-    // when UI-only state changes (like showFilterPanel). This was causing an infinite loop:
-    // 1. Click filter button → showFilterPanel changes → component re-renders
-    // 2. useReactTable called with new config object → TanStack re-initializes table
-    // 3. During init, callbacks fire → state updates → another re-render → loop continues
-    // By memoizing the config, the table only re-initializes when actual dependencies change.
-    // Also removed columnFilters, globalFilter, and pagination from controlled state since
-    // we handle filtering externally - this prevents TanStack from trying to manage state
-    // we don't need it to control.
     const tableConfig = useMemo(
         () => ({
             data: sortedData || [],
@@ -415,12 +508,14 @@ export function AirtableDataTable({
                 rowSelection: rowSelection || {},
                 columnSizing: columnSizing || {},
                 grouping: grouping || [],
+                pagination,
             },
             onSortingChange: setSorting,
             onColumnVisibilityChange: setColumnVisibility,
             onRowSelectionChange: setRowSelection,
             onColumnSizingChange: setColumnSizing,
             onGroupingChange: setGrouping,
+            onPaginationChange: setPagination,
             getCoreRowModel: getCoreRowModel(),
             getSortedRowModel: getSortedRowModel(),
             getFilteredRowModel: getFilteredRowModel(),
@@ -428,6 +523,8 @@ export function AirtableDataTable({
             enableRowSelection: true,
             enableColumnResizing: true,
             columnResizeMode: "onChange",
+            enableMultiSort: true,
+            maxMultiSortColCount: 3,
         }),
         [
             sortedData,
@@ -437,6 +534,7 @@ export function AirtableDataTable({
             rowSelection,
             columnSizing,
             grouping,
+            pagination,
         ]
     );
 
@@ -528,7 +626,7 @@ export function AirtableDataTable({
     // Mobile card view
     if (isMobile) {
         return (
-            <div className="space-y-4">
+            <div className="space-y-4 px-2 sm:px-4">
                 <AirtableToolbar
                     table={table}
                     globalFilter={globalFilterInput}
@@ -618,131 +716,155 @@ export function AirtableDataTable({
             />
 
             {/* Table Grid */}
-            <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-                <div className="overflow-x-auto">
-                    <table
-                        className="w-full border-collapse"
-                        style={{ tableLayout: "fixed" }}
-                    >
-                        {/* Sticky Header */}
-                        <thead className="sticky top-0 z-20 bg-gray-50 border-b border-gray-200">
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <tr
-                                    key={headerGroup.id}
-                                    className={cn(
-                                        "h-12",
-                                        density === "compact" && "h-10",
-                                        density === "comfortable" && "h-14"
-                                    )}
-                                >
-                                    {headerGroup.headers.map((header, idx) => {
-                                        const column = header.column;
-                                        const isFrozen =
-                                            frozenColumns.includes(column.id) ||
-                                            column.id === "select";
-                                        const frozenOffset = isFrozen ? getFrozenOffset(idx) : 0;
-                                        const canSort = column.getCanSort();
-                                        const sortDirection = column.getIsSorted();
+            <div className="p-3 hidden md:block">
+                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <div className="overflow-x-auto">
+                        <table
+                            className="w-full border-collapse"
+                            style={{ tableLayout: "fixed" }}
+                        >
+                            {/* Sticky Header */}
+                            <thead className="sticky top-0 bg-white z-20 shadow-sm border-b border-gray-200">
+                                {table.getHeaderGroups().map((headerGroup) => {
+                                    // Density-based header height and padding
+                                    const headerHeightClass =
+                                        density === "compact" ? "h-8" :
+                                            density === "comfortable" ? "h-14" :
+                                                "h-12"; // standard
 
-                                        return (
-                                            <th
-                                                key={header.id}
-                                                className={cn(
-                                                    "px-3 text-left text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200 last:border-r-0 relative",
-                                                    canSort && "cursor-pointer hover:bg-gray-100",
-                                                    isFrozen && "sticky z-30 bg-gray-50"
-                                                )}
-                                                style={{
-                                                    width: header.getSize(),
-                                                    left: isFrozen ? `${frozenOffset}px` : undefined,
-                                                }}
-                                                draggable={column.id !== "select"}
-                                                onDragStart={() =>
-                                                    column.id !== "select" &&
-                                                    handleColumnDragStart(column.id)
-                                                }
-                                                onDragOver={(e) =>
-                                                    column.id !== "select" &&
-                                                    handleColumnDragOver(e, column.id)
-                                                }
-                                                onDragEnd={handleColumnDragEnd}
-                                                onClick={() => canSort && column.toggleSorting()}
-                                            >
-                                                <div className="flex items-center justify-left gap-2">
-                                                    {flexRender(
-                                                        column.columnDef.header,
-                                                        header.getContext()
-                                                    )}
-                                                    {canSort && (
-                                                        <span className="text-gray-400">
-                                                            {sortDirection === "asc"
-                                                                ? "↑"
-                                                                : sortDirection === "desc"
-                                                                    ? "↓"
-                                                                    : "⇅"}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                {column.getCanResize() && (
-                                                    <div
-                                                        className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-400 opacity-0 hover:opacity-100 transition-opacity"
-                                                        onMouseDown={(e) => {
-                                                            e.preventDefault();
-                                                            const startX = e.clientX;
-                                                            const startWidth = column.getSize();
+                                    const headerPaddingClass =
+                                        density === "compact" ? "px-3 py-1.5" :
+                                            density === "comfortable" ? "px-4 py-4" :
+                                                "px-4 py-3"; // standard
 
-                                                            const handleMouseMove = (e) => {
-                                                                const diff = e.clientX - startX;
-                                                                const newWidth = Math.max(
-                                                                    column.columnDef.minSize || 100,
-                                                                    startWidth + diff
-                                                                );
-                                                                column.setSize(newWidth);
-                                                            };
+                                    return (
+                                        <tr key={headerGroup.id} className={headerHeightClass}>
+                                            {headerGroup.headers.map((header, idx) => {
+                                                const column = header.column;
+                                                const isFrozen =
+                                                    frozenColumns.includes(column.id) ||
+                                                    column.id === "select";
+                                                const frozenOffset = isFrozen ? getFrozenOffset(idx) : 0;
+                                                const canSort = column.getCanSort();
+                                                const sortDirection = column.getIsSorted();
 
-                                                            const handleMouseUp = () => {
-                                                                document.removeEventListener(
-                                                                    "mousemove",
-                                                                    handleMouseMove
-                                                                );
-                                                                document.removeEventListener(
-                                                                    "mouseup",
-                                                                    handleMouseUp
-                                                                );
-                                                            };
-
-                                                            document.addEventListener(
-                                                                "mousemove",
-                                                                handleMouseMove
-                                                            );
-                                                            document.addEventListener(
-                                                                "mouseup",
-                                                                handleMouseUp
-                                                            );
+                                                return (
+                                                    <th
+                                                        key={header.id}
+                                                        className={cn(
+                                                            "text-left text-[13px] font-semibold tracking-wide text-gray-700 bg-white border-r border-gray-200 last:border-r-0 relative",
+                                                            headerPaddingClass,
+                                                            canSort && "cursor-pointer hover:bg-gray-50",
+                                                            isFrozen && "sticky z-30 bg-white",
+                                                            draggedColumn === column.id && "opacity-50"
+                                                        )}
+                                                        style={{
+                                                            width: header.getSize(),
+                                                            left: isFrozen ? `${frozenOffset}px` : undefined,
                                                         }}
-                                                    />
-                                                )}
-                                            </th>
-                                        );
-                                    })}
-                                </tr>
-                            ))}
-                        </thead>
-                        <tbody>
-                            {visibleRows.map((row, rowIndex) => (
-                                <TableRow
-                                    key={row.id}
-                                    row={row}
-                                    rowIndex={rowIndex}
-                                    density={density}
-                                    frozenColumns={frozenColumns}
-                                    getFrozenOffset={getFrozenOffset}
-                                />
-                            ))}
-                        </tbody>
-                    </table>
+                                                        draggable={column.id !== "select" && column.id !== "actions"}
+                                                        onDragStart={() =>
+                                                            column.id !== "select" && column.id !== "actions" &&
+                                                            handleColumnDragStart(column.id)
+                                                        }
+                                                        onDragOver={(e) =>
+                                                            column.id !== "select" && column.id !== "actions" &&
+                                                            handleColumnDragOver(e, column.id)
+                                                        }
+                                                        onDragEnd={handleColumnDragEnd}
+                                                        onClick={(e) => {
+                                                            if (!canSort) return;
+                                                            if (e.shiftKey) {
+                                                                column.toggleSorting(undefined, true);
+                                                            } else {
+                                                                column.toggleSorting();
+                                                            }
+                                                        }}
+                                                    >
+                                                        <div className="flex items-center gap-2 group">
+                                                            <span className="flex-1">
+                                                                {flexRender(
+                                                                    column.columnDef.header,
+                                                                    header.getContext()
+                                                                )}
+                                                            </span>
+                                                            {canSort && (
+                                                                <span className="flex-shrink-0">
+                                                                    {sortDirection === "asc" ? (
+                                                                        <ChevronUp className="h-4 w-4 text-gray-500" />
+                                                                    ) : sortDirection === "desc" ? (
+                                                                        <ChevronDown className="h-4 w-4 text-gray-500" />
+                                                                    ) : (
+                                                                        <ArrowUpDown className="h-4 w-4 text-gray-500 opacity-40" />
+                                                                    )}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {column.getCanResize() && (
+                                                            <div
+                                                                className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-blue-400/50 transition-opacity duration-150 opacity-0 hover:opacity-100"
+                                                                onMouseDown={(e) => {
+                                                                    e.preventDefault();
+                                                                    const startX = e.clientX;
+                                                                    const startWidth = column.getSize();
+
+                                                                    const handleMouseMove = (e) => {
+                                                                        const diff = e.clientX - startX;
+                                                                        const newWidth = Math.max(
+                                                                            column.columnDef.minSize || 100,
+                                                                            startWidth + diff
+                                                                        );
+                                                                        column.setSize(newWidth);
+                                                                    };
+
+                                                                    const handleMouseUp = () => {
+                                                                        document.removeEventListener(
+                                                                            "mousemove",
+                                                                            handleMouseMove
+                                                                        );
+                                                                        document.removeEventListener(
+                                                                            "mouseup",
+                                                                            handleMouseUp
+                                                                        );
+                                                                    };
+
+                                                                    document.addEventListener(
+                                                                        "mousemove",
+                                                                        handleMouseMove
+                                                                    );
+                                                                    document.addEventListener(
+                                                                        "mouseup",
+                                                                        handleMouseUp
+                                                                    );
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </th>
+                                                );
+                                            })}
+                                        </tr>
+                                    );
+                                })}
+                            </thead>
+                            <tbody>
+                                {visibleRows.map((row, rowIndex) => (
+                                    <TableRow
+                                        key={row.id}
+                                        row={row}
+                                        rowIndex={rowIndex}
+                                        density={density}
+                                        frozenColumns={frozenColumns}
+                                        getFrozenOffset={getFrozenOffset}
+                                        editingCell={editingCell}
+                                        columnOrder={columnOrder}
+                                    />
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+            <AirtablePagination table={table} />
         </div>
     );
 }

@@ -31,6 +31,7 @@ export function AirtableCell({
     onStartEdit,
     onSave,
     onCancel,
+    renderDisplay,
 }) {
     const [localValue, setLocalValue] = useState(value);
     const inputRef = useRef(null);
@@ -50,6 +51,7 @@ export function AirtableCell({
             e.preventDefault();
             onSave(localValue);
         } else if (e.key === "Escape") {
+            e.preventDefault(); // Prevent modal closing if inside one
             onCancel();
             setLocalValue(value);
         }
@@ -58,8 +60,6 @@ export function AirtableCell({
     const handleBlur = () => {
         // Delay save to allow for clicks on dropdowns/calendars
         // But for simple inputs, we can save immediately
-        // For complex components, we might need to handle blur differently
-        // Here we'll rely on the specific components' behavior or onSave calls
         if (column.fieldType === "text" || column.fieldType === "email" || column.fieldType === "phone") {
             onSave(localValue);
         }
@@ -69,12 +69,12 @@ export function AirtableCell({
         return (
             <div
                 className={cn(
-                    "w-full h-full min-h-[32px] flex items-center px-2 cursor-pointer hover:bg-gray-100 rounded transition-colors truncate",
+                    "w-full h-full min-h-[32px] flex items-center cursor-pointer hover:bg-gray-100 rounded transition-colors truncate",
                     !value && "text-gray-400 italic"
                 )}
                 onClick={onStartEdit}
             >
-                {renderDisplayValue(value, column)}
+                {renderDisplay ? renderDisplay(value, row) : renderDisplayValue(value, column)}
             </div>
         );
     }
@@ -90,7 +90,11 @@ export function AirtableCell({
                         if (!open) onSave(localValue);
                     }}
                     value={localValue}
-                    onValueChange={setLocalValue}
+                    onValueChange={(val) => {
+                        setLocalValue(val);
+                        // Optional: auto-save on selection
+                        // onSave(val); 
+                    }}
                 >
                     <SelectTrigger className="h-8 w-full border-none focus:ring-0 px-2">
                         <SelectValue placeholder="Select..." />
@@ -124,8 +128,9 @@ export function AirtableCell({
                             mode="single"
                             selected={localValue ? new Date(localValue) : undefined}
                             onSelect={(date) => {
-                                setLocalValue(date ? date.toISOString() : null);
-                                onSave(date ? date.toISOString() : null);
+                                const val = date ? date.toISOString() : null;
+                                setLocalValue(val);
+                                onSave(val);
                             }}
                             initialFocus
                         />
@@ -191,6 +196,36 @@ export function AirtableCell({
     }
 }
 
+// Helper function to get status badge styles
+function getStatusBadgeStyles(value) {
+    const status = String(value).toLowerCase();
+    
+    switch (status) {
+        case "in progress":
+        case "in-progress":
+        case "inprogress":
+            return "bg-blue-100 text-blue-700 border-0";
+        case "open":
+            return "bg-blue-50 text-blue-500 border-0";
+        case "resolved":
+        case "closed":
+        case "done":
+        case "completed":
+            return "bg-teal-100 text-teal-700 border-0";
+        case "active":
+            return "bg-emerald-100 text-emerald-700 border-0";
+        case "inactive":
+        case "pending":
+            return "bg-amber-100 text-amber-700 border-0";
+        case "cancelled":
+        case "cancelled":
+        case "rejected":
+            return "bg-red-100 text-red-700 border-0";
+        default:
+            return "bg-gray-100 text-gray-700 border-0";
+    }
+}
+
 function renderDisplayValue(value, column) {
     if (value === null || value === undefined || value === "") return <span className="text-gray-300">Empty</span>;
 
@@ -204,13 +239,34 @@ function renderDisplayValue(value, column) {
         case "select":
         case "dropdown":
             const option = column.options?.find((opt) => opt.value === value);
+            const displayText = option ? option.label : value;
+            
+            // Check if this is a status column
+            const isStatusColumn = column.id?.toLowerCase().includes("status") || 
+                                  column.label?.toLowerCase().includes("status") ||
+                                  column.fieldType === "status";
+            
+            if (isStatusColumn) {
+                return (
+                    <Badge 
+                        className={cn(
+                            "rounded-md px-2.5 py-1 text-xs font-medium border-0",
+                            getStatusBadgeStyles(value)
+                        )}
+                    >
+                        {displayText}
+                    </Badge>
+                );
+            }
+            
+            // Default badge for non-status selects
             return (
-                <Badge variant="outline" className={cn("font-normal",
-                    value === 'active' ? 'bg-green-50 text-green-700 border-green-200' :
-                        value === 'inactive' ? 'bg-red-50 text-red-700 border-red-200' :
-                            'bg-gray-50 text-gray-700 border-gray-200'
+                <Badge variant="outline" className={cn("font-normal rounded-md px-2.5 py-1",
+                    value === 'active' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                        value === 'inactive' ? 'bg-red-100 text-red-700 border-red-200' :
+                            'bg-gray-100 text-gray-700 border-gray-200'
                 )}>
-                    {option ? option.label : value}
+                    {displayText}
                 </Badge>
             );
         case "multi-select":
@@ -218,7 +274,7 @@ function renderDisplayValue(value, column) {
             return (
                 <div className="flex flex-wrap gap-1">
                     {value.map(v => (
-                        <Badge key={v} variant="secondary" className="h-5 px-1 text-[10px]">
+                        <Badge key={v} variant="secondary" className="h-5 px-1 text-[10px] rounded-md">
                             {v}
                         </Badge>
                     ))}

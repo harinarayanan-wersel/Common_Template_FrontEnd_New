@@ -4,8 +4,9 @@ import { Link } from "react-router-dom";
 import {
   fetchUsers,
   deleteUser as deleteUserThunk,
+  updateUser,
 } from "../slices/usersSlice.js";
-import { fetchRoles } from "@/features/roles/slices/rolesSlice.js";
+import { fetchRoles, selectRoles } from "@/features/roles/slices/rolesSlice.js";
 import { Button } from "../../../components/ui/button.jsx";
 import { Card, CardContent } from "../../../components/ui/card.jsx";
 import { Skeleton } from "../../../components/ui/skeleton.jsx";
@@ -61,7 +62,9 @@ const formatUserForDisplay = (user, index) => {
     .join(" ")
     .trim();
   const fallbackName = user.email?.split("@")[0] || `User ${index + 1}`;
-  const primaryRole = user.roles?.find(Boolean)?.name ?? "Team Member";
+  const primaryRoleObj = user.roles?.find(Boolean);
+  const primaryRole = primaryRoleObj?.name ?? "Team Member";
+  const primaryRoleId = primaryRoleObj?.id;
 
   return {
     id: user.id,
@@ -70,6 +73,7 @@ const formatUserForDisplay = (user, index) => {
     email: user.email || "",
     phone: user.phone || "N/A",
     role: primaryRole,
+    roleId: primaryRoleId,
     roleName: primaryRole,
     teamUnit: user.team_unit || "General",
     status: user.is_active ? "active" : "inactive",
@@ -87,6 +91,7 @@ export const UsersPage = () => {
   const dispatch = useDispatch();
   const { toast } = useToast();
   const { users, status, error } = useSelector((state) => state.users);
+  const rolesList = useSelector(selectRoles);
   const rolesStatus = useSelector((state) => state.roles.status);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -113,7 +118,7 @@ export const UsersPage = () => {
   }, [users]);
 
   // Define columns for AirtableDataTable
-  const columns = [
+  const columns = useMemo(() => [
     {
       id: "user",
       label: "User",
@@ -174,7 +179,7 @@ export const UsersPage = () => {
     {
       id: "role",
       label: "Role",
-      accessorKey: "role",
+      accessorKey: "roleId",
       sortable: true,
       editable: true,
       filterable: true,
@@ -182,12 +187,7 @@ export const UsersPage = () => {
       minWidth: 120,
       maxWidth: 200,
       fieldType: "dropdown",
-      options: [
-        { value: "admin", label: "Admin" },
-        { value: "manager", label: "Manager" },
-        { value: "team member", label: "Team Member" },
-        { value: "viewer", label: "Viewer" },
-      ],
+      options: rolesList.map(role => ({ value: role.id, label: role.name })),
     },
     {
       id: "status",
@@ -231,7 +231,7 @@ export const UsersPage = () => {
       maxWidth: 180,
       fieldType: "date",
     },
-  ];
+  ], [rolesList]);
 
   // Handlers
   const handleEdit = (row) => {
@@ -313,27 +313,7 @@ export const UsersPage = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h5 className="!mb-0 text-2xl font-semibold text-foreground"></h5>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link
-            to={ROUTES.DASHBOARD}
-            className="flex items-center gap-1 hover:text-foreground transition-colors"
-          >
-            <Home className="h-4 w-4" />
-            <span>Dashboard</span>
-          </Link>
-          <ChevronRight className="h-4 w-4" />
-          <Link
-            to={ROUTES.USERS}
-            className="hover:text-foreground transition-colors"
-          >
-            Users
-          </Link>
-          <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground font-medium">Users List</span>
-        </div>
-      </div>
+
 
       <Card className="shadow-[0_1px_4px_rgba(0,0,0,0.05)] rounded-xl border border-border bg-white">
         <CardContent className="p-4 sm:p-6">
@@ -377,9 +357,48 @@ export const UsersPage = () => {
                   data={displayUsers}
                   columns={columns}
                   onCellEdit={(row, columnId, value) => {
-                    // Handle inline cell editing
-                    console.log("Cell edit:", row, columnId, value);
-                    // You can dispatch an update action here
+                    const userId = row.rawUser?.id ?? row.id;
+                    let updateData = {};
+
+                    switch (columnId) {
+                      case "user":
+                        const parts = value.trim().split(" ");
+                        if (parts.length > 0) {
+                          updateData.first_name = parts[0];
+                          updateData.last_name = parts.slice(1).join(" ");
+                        }
+                        break;
+                      case "email":
+                        updateData.email = value;
+                        break;
+                      case "phone":
+                        updateData.phone = value;
+                        break;
+                      case "role":
+                        updateData.role_ids = [value]; // Assuming API expects array of role IDs
+                        break;
+                      case "status":
+                        updateData.is_active = value === "active";
+                        break;
+                      default:
+                        return;
+                    }
+
+                    if (Object.keys(updateData).length > 0) {
+                      dispatch(updateUser({ id: userId, data: updateData }))
+                        .unwrap()
+                        .then(() => {
+                          toast({ title: "User updated successfully" });
+                          dispatch(fetchUsers(listQuery));
+                        })
+                        .catch((err) => {
+                          toast({
+                            variant: "destructive",
+                            title: "Update failed",
+                            description: getErrorMessage(err),
+                          });
+                        });
+                    }
                   }}
                   onRowDelete={handleDelete}
                   onBulkAction={(action, rows) => {

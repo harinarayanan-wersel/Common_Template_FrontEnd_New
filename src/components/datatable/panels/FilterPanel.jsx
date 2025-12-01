@@ -47,7 +47,7 @@ export function FilterPanel({ columns, filters, onFiltersChange, open, onOpenCha
                 <Button
                     variant={filters.length > 0 ? "secondary" : "outline"}
                     size="sm"
-                    className="h-9 gap-2 border-gray-200 bg-white hover:bg-gray-50 shadow-sm"
+                    className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-md bg-white hover:bg-gray-50 text-sm shadow-sm h-9"
                 >
                     <Plus className="h-4 w-4" />
                     Filter
